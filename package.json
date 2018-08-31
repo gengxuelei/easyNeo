@@ -1,0 +1,30 @@
+{
+  "name": "easyneo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gengxuelei/easyNeo.git"
+  },
+  "keywords": [
+    "neo",
+    "btc",
+    "eth",
+    "gas",
+    "nel",
+    "coz"
+  ],
+  "author": "Layne",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gengxuelei/easyNeo/issues"
+  },
+  "homepage": "https://github.com/gengxuelei/easyNeo#readme",
+  "dependencies": {
+    "nel-neo-thinsdk": "^0.0.9"
+  }
+}
