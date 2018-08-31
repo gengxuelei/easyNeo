@@ -1,4 +1,4 @@
-# easyNeo
+easyNeo
 ===============
 
 [![NPM version][npm-image]][npm-url]
