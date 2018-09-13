@@ -8,10 +8,10 @@ easyNeo
 
 [npm-image]: https://img.shields.io/npm/v/easyneo.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/easyneo
-[travis-image]: https://img.shields.io/travis/easyneo.svg?style=flat-square
-[travis-url]: https://travis-ci.org/easyneo
-[coveralls-image]: https://img.shields.io/coveralls/easyneo.svg?style=flat-square
-[coveralls-url]: https://coveralls.io/r/easyneo?branch=master
+[travis-image]: https://img.shields.io/travis/gengxuelei/easyneo.svg?style=flat-square
+[travis-url]: https://travis-ci.org/gengxuelei/easyneo
+[coveralls-image]: https://img.shields.io/coveralls/gengxuelei/easyneo.svg?style=flat-square
+[coveralls-url]: https://coveralls.io/r/gengxuelei/easyneo?branch=master
 [node-image]: https://img.shields.io/badge/node.js-%3E=_7.6-green.svg?style=flat-square
 [node-url]: http://nodejs.org/download/
 
