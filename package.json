@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/gengxuelei/easyNeo#readme",
   "dependencies": {
+    "axios": "^0.18.0",
     "nel-neo-thinsdk": "^0.0.9"
   }
 }

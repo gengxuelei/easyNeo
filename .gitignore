@@ -71,3 +71,8 @@ typings/
 
 # Serverless directories
 .serverless
+
+# secert
+key.json
+
+.vscode

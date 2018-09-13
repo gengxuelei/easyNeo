@@ -46,17 +46,17 @@ function transferGlobalCoin(wif, utxos, assertId, toAddr, amount) {
 
 // 直接调用合约（与utxo无关）
 function callC(wif, scHash, method, params) {
-  var prikey = ThinNeo.Helper.GetPrivateKeyFromWIF(wif);
-  var pubkey = ThinNeo.Helper.GetPublicKeyFromPrivateKey(prikey);
-  var address = ThinNeo.Helper.GetAddressFromPublicKey(pubkey);
+  let prikey = ThinNeo.Helper.GetPrivateKeyFromWIF(wif);
+  let pubkey = ThinNeo.Helper.GetPublicKeyFromPrivateKey(prikey);
+  let address = ThinNeo.Helper.GetAddressFromPublicKey(pubkey);
   let addressHash = ThinNeo.Helper.GetPublicKeyScriptHash_FromAddress(address);
   // 封装交易
-  var tran = new ThinNeo.Transaction();
+  let tran = new ThinNeo.Transaction();
   tran.type = ThinNeo.TransactionType.InvocationTransaction;
   tran.extdata = new ThinNeo.InvokeTransData();
-  var sb = new ThinNeo.ScriptBuilder();
-  var scriptaddress = scHash.hexToBytes().reverse();
-  var randomNum = new Neo.BigInteger(Math.floor(Math.random() * 10000))
+  let sb = new ThinNeo.ScriptBuilder();
+  let scriptaddress = scHash.hexToBytes().reverse();
+  let randomNum = new Neo.BigInteger(Math.floor(Math.random() * 10000))
   sb.EmitPushNumber(randomNum);
   sb.Emit(ThinNeo.OpCode.DROP);
   sb.EmitParamJson(params);
@@ -69,11 +69,11 @@ function callC(wif, scHash, method, params) {
   tran.attributes[0] = new ThinNeo.Attribute();
   tran.attributes[0].usage = ThinNeo.TransactionAttributeUsage.Script;
   tran.attributes[0].data = addressHash;
-  var msg = tran.GetMessage();
-  var signdata = ThinNeo.Helper.Sign(msg, prikey);
+  let msg = tran.GetMessage();
+  let signdata = ThinNeo.Helper.Sign(msg, prikey);
   tran.AddWitness(signdata, pubkey, address);
-  let txid = tran.GetHash().clone().reverse().toHexString();
-  var rawData = tran.GetRawData().toHexString();
+  let txid = "0x" + tran.GetHash().clone().reverse().toHexString();
+  let rawData = tran.GetRawData().toHexString();
   return {
     txid,
     rawData
@@ -88,6 +88,12 @@ function callC2(wif, globalCoinParams, callParams) {
   let addressHash = ThinNeo.Helper.GetPublicKeyScriptHash_FromAddress(address);
   let toAddrHash = ThinNeo.Helper.GetPublicKeyScriptHash_FromAddress(globalCoinParams.toAddr);
   let assertId = globalCoinParams.assertId;
+  if (assertId === "neo") {
+    assertId = config.neoId;
+  }
+  if (assertId === "gas") {
+    assertId = config.neoGasId;
+  }
   let assertIdBytes = assertId.hexToBytes().reverse();
   let sendcount = Neo.Fixed8.parse(globalCoinParams.amount.toString());
 
