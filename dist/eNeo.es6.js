@@ -1,6 +1,6 @@
 window.eNeo = {};
 
-eNeo.version = "1.1.0";
+eNeo.version = "1.1.1";
 
 // 配置
 eNeo.config = {
