@@ -28,7 +28,7 @@
   }
 
   // 只转全局资产快捷方法
-  function transferGlobalCoin(wif, utxos, assertId, toAddr, amount) {
+  function transferGlobalCoin(wif, utxos, assertId, toAddrArr) {
     if (assertId === "neo") {
       assertId = config.neoId;
     }
@@ -37,8 +37,7 @@
     }
     let globalCoinParams = {
       assertId,
-      amount,
-      toAddr,
+      toAddrArr,
       utxos
     };
     return callC2(wif, globalCoinParams);
@@ -86,7 +85,16 @@
     let pubkey = ThinNeo.Helper.GetPublicKeyFromPrivateKey(prikey);
     let address = ThinNeo.Helper.GetAddressFromPublicKey(pubkey);
     let addressHash = ThinNeo.Helper.GetPublicKeyScriptHash_FromAddress(address);
-    let toAddrHash = ThinNeo.Helper.GetPublicKeyScriptHash_FromAddress(globalCoinParams.toAddr);
+    // 转出账户序列
+    let toAddrArr = globalCoinParams.toAddrArr;
+    toAddrArr = toAddrArr.map(item => {
+      item.toAddrHash = ThinNeo.Helper.GetPublicKeyScriptHash_FromAddress(item.toAddr);
+      return item;
+    });
+    let sendcount = toAddrArr.reduce((prev, next) => {
+      return prev.add(Neo.Fixed8.parse(next.amount.toString()));
+    }, Neo.Fixed8.Zero);
+
     let assertId = globalCoinParams.assertId;
     if (assertId === "neo") {
       assertId = config.neoId;
@@ -95,7 +103,6 @@
       assertId = config.neoGasId;
     }
     let assertIdBytes = assertId.hexToBytes().reverse();
-    let sendcount = Neo.Fixed8.parse(globalCoinParams.amount.toString());
 
     // 封装交易信息
     let tran = new ThinNeo.Transaction();
@@ -127,11 +134,14 @@
       return false;
     }
     //输出
-    let output = new ThinNeo.TransactionOutput();
-    output.assetId = assertIdBytes;
-    output.value = sendcount;
-    output.toAddress = toAddrHash;
-    tran.outputs.push(output);
+    toAddrArr.forEach(item => {
+      let output = new ThinNeo.TransactionOutput();
+      output.assetId = assertIdBytes;
+      output.value = Neo.Fixed8.parse(item.amount.toString());
+      output.toAddress = item.toAddrHash;
+      tran.outputs.push(output);
+    });
+
     //找零
     let change = count.subtract(sendcount);
     if (change.compareTo(Neo.Fixed8.Zero) > 0) {

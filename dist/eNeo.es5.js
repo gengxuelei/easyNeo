@@ -30,7 +30,7 @@
   }
 
   // 只转全局资产快捷方法
-  function transferGlobalCoin(wif, utxos, assertId, toAddr, amount) {
+  function transferGlobalCoin(wif, utxos, assertId, toAddrArr) {
     if (assertId === "neo") {
       assertId = config.neoId;
     }
@@ -39,8 +39,7 @@
     }
     var globalCoinParams = {
       assertId: assertId,
-      amount: amount,
-      toAddr: toAddr,
+      toAddrArr: toAddrArr,
       utxos: utxos
     };
     return callC2(wif, globalCoinParams);
@@ -88,7 +87,16 @@
     var pubkey = ThinNeo.Helper.GetPublicKeyFromPrivateKey(prikey);
     var address = ThinNeo.Helper.GetAddressFromPublicKey(pubkey);
     var addressHash = ThinNeo.Helper.GetPublicKeyScriptHash_FromAddress(address);
-    var toAddrHash = ThinNeo.Helper.GetPublicKeyScriptHash_FromAddress(globalCoinParams.toAddr);
+    // 转出账户序列
+    var toAddrArr = globalCoinParams.toAddrArr;
+    toAddrArr = toAddrArr.map(function (item) {
+      item.toAddrHash = ThinNeo.Helper.GetPublicKeyScriptHash_FromAddress(item.toAddr);
+      return item;
+    });
+    var sendcount = toAddrArr.reduce(function (prev, next) {
+      return prev.add(Neo.Fixed8.parse(next.amount.toString()));
+    }, Neo.Fixed8.Zero);
+
     var assertId = globalCoinParams.assertId;
     if (assertId === "neo") {
       assertId = config.neoId;
@@ -97,7 +105,6 @@
       assertId = config.neoGasId;
     }
     var assertIdBytes = assertId.hexToBytes().reverse();
-    var sendcount = Neo.Fixed8.parse(globalCoinParams.amount.toString());
 
     // 封装交易信息
     var tran = new ThinNeo.Transaction();
@@ -129,11 +136,14 @@
       return false;
     }
     //输出
-    var output = new ThinNeo.TransactionOutput();
-    output.assetId = assertIdBytes;
-    output.value = sendcount;
-    output.toAddress = toAddrHash;
-    tran.outputs.push(output);
+    toAddrArr.forEach(function (item) {
+      var output = new ThinNeo.TransactionOutput();
+      output.assetId = assertIdBytes;
+      output.value = Neo.Fixed8.parse(item.amount.toString());
+      output.toAddress = item.toAddrHash;
+      tran.outputs.push(output);
+    });
+
     //找零
     var change = count.subtract(sendcount);
     if (change.compareTo(Neo.Fixed8.Zero) > 0) {

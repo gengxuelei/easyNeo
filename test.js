@@ -41,8 +41,8 @@ async function testEmit() {
 // 测试nep5资产的转账
 async function testTransferNep5() {
   let scHash = key.scHash;
-  let wif = key.wif2;
-  let toAddr = key.addr1;
+  let wif = key.wif1;
+  let toAddr = key.addr2;
   let amount = 300000000;
   let rawObj = eNeo.transferNep5(wif, scHash, toAddr, amount);
   // console.log(rawObj);
@@ -54,12 +54,17 @@ async function testTransferNep5() {
 // neo和gas的转账要等前一笔成功才能执行第二笔（或者手动拼装utxo）
 // 所以transferNeo和transferNep5WithNeo不能同时执行
 async function transferNeo() {
-  let wif = key.wif2;
-  let toAddr = key.addr1;
-  let amount = 2;
-  let _utxos = await eNeo.getRpc("getutxo", key.addr2);
+  let wif = key.wif1;
+  let toAddrArr = [{
+    toAddr: key.addr2,
+    amount: 2
+  }, {
+    toAddr: key.addr3,
+    amount: 3
+  }];
+  let _utxos = await eNeo.getRpc("getutxo", key.addr1);
   let utxos = _utxos["data"]["result"];
-  let rawObj = eNeo.transferGlobalCoin(wif, utxos, "neo", toAddr, amount);
+  let rawObj = eNeo.transferGlobalCoin(wif, utxos, "neo", toAddrArr);
   // console.log(rawObj);
   let res = await eNeo.getRpc("sendrawtransaction", rawObj.rawData);
   console.log("transferNeo##########");
@@ -69,7 +74,7 @@ async function transferNeo() {
 // neo和gas的转账要等前一笔成功才能执行第二笔（或者手动拼装utxo）
 // 所以transferNeo和transferNep5WithNeo不能同时执行
 async function transferNep5WithNeo() {
-  let wif = key.wif2;
+  let wif = key.wif1;
   let prikey = ThinNeo.Helper.GetPrivateKeyFromWIF(wif);
   let pubkey = ThinNeo.Helper.GetPublicKeyFromPrivateKey(prikey);
   let address = ThinNeo.Helper.GetAddressFromPublicKey(pubkey);
@@ -77,13 +82,20 @@ async function transferNep5WithNeo() {
   let scHash = key.scHash;
   let toAddr = key.addr1;
 
-  let _utxos = await eNeo.getRpc("getutxo", key.addr2);
+  let _utxos = await eNeo.getRpc("getutxo", key.addr1);
   let utxos = _utxos["data"]["result"];
+
+  let toAddrArr = [{
+    toAddr: key.addr2,
+    amount: 2
+  }, {
+    toAddr: key.addr3,
+    amount: 3
+  }];
 
   let globalCoinParams = {
     assertId: "neo",
-    amount: 2,
-    toAddr,
+    toAddrArr,
     utxos
   };
 
@@ -104,12 +116,12 @@ async function transferNep5WithNeo() {
 }
 
 function init() {
-  testFetch();
+  // testFetch();
   // testEmit();
   // testTransferNep5();
   // neo和gas的转账要等前一笔成功才能执行第二笔（或者手动拼装utxo）
   // 所以transferNeo和transferNep5WithNeo不能同时执行
-  // transferNeo();
+  transferNeo();
   // transferNep5WithNeo();
 }
 
