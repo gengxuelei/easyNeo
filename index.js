@@ -157,7 +157,7 @@ function callC2(wif, globalCoinParams, callParams) {
   let msg = tran.GetMessage();
   let signdata = ThinNeo.Helper.Sign(msg, prikey);
   tran.AddWitness(signdata, pubkey, address);
-  let txid = tran.GetHash().clone().reverse().toHexString();
+  let txid = "0x" + tran.GetHash().clone().reverse().toHexString();
   let rawData = tran.GetRawData().toHexString();
   return {
     txid,
